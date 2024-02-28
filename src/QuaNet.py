@@ -17,7 +17,7 @@ import networkx as nx
 import pickle as pk
 
 # internal files
-from utils.Citation import *
+# from utils.Citation import *
 from layer.src2 import quaternion_laplacian
 from layer.Signum_quaternion import QuaNet_node_prediction_one_laplacian
 from utils.hermitian import *
@@ -38,9 +38,9 @@ def parse_args():
     parser.add_argument('--log_root', type=str, default='../logs/', help='the path saving model.t7 and the training process')
     parser.add_argument('--log_path', type=str, default='test', help='the path saving model.t7 and the training process, the name of folder will be log/(current time)')
     parser.add_argument('--data_path', type=str, default='../dataset/data/tmp/', help='data set folder, for default format see dataset/cora/cora.edges and cora.node_labels')
-    parser.add_argument('--dataset', type=str, default='migration/migration', help='data set selection')
+    parser.add_argument('--dataset', type=str, default='WebKB/Cornell', help='data set selection')
 
-    parser.add_argument('--epochs', type=int, default=1, help='Number of (maximal) training epochs.')
+    parser.add_argument('--epochs', type=int, default=500, help='Number of (maximal) training epochs.')
     parser.add_argument('--method_name', type=str, default='SigNum', help='method name')
     parser.add_argument('--seed', type=int, default=0, help='Random seed for training testing split/random graph generation.')
 
@@ -56,7 +56,7 @@ def parse_args():
     parser.add_argument('--lr', type=float, default=5e-3, help='learning rate')
     parser.add_argument('--l2', type=float, default=5e-4, help='l2 regularizer')
 
-    parser.add_argument('--num_filter', type=int, default=1, help='num of filters')
+    parser.add_argument('--num_filter', type=int, default=64, help='num of filters')
     parser.add_argument('--randomseed', type=int, default=0, help='if set random seed in training')
     return parser.parse_args()
 
@@ -88,15 +88,19 @@ def main(args):
 
     dataset_name = args.dataset.split('/')
     if len(dataset_name) == 1:
-        try:
-            data = pk.load(open(f'./data/fake/{args.dataset}.pk','rb'))
-        except:
-            data = pk.load(open(f'./data/fake_for_quaternion_new/{args.dataset}.pk','rb'))
-        data = node_class_split(data, train_size_per_class=0.6, val_size_per_class=0.2)
-        subset = args.dataset
+        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[0])
     else:
-        load_func, subset = args.dataset.split('/')[0], args.dataset.split('/')[1]
-        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])#.to(device)
+        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])
+    # if len(dataset_name) == 1:
+    #     try:
+    #         data = pk.load(open(f'./data/fake/{args.dataset}.pk','rb'))
+    #     except:
+    #         data = pk.load(open(f'./data/fake_for_quaternion_new/{args.dataset}.pk','rb'))
+    #     data = node_class_split(data, train_size_per_class=0.6, val_size_per_class=0.2)
+    #     subset = args.dataset
+    # else:
+    #     load_func, subset = args.dataset.split('/')[0], args.dataset.split('/')[1]
+    #     data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])#.to(device)
     dataset = data
 
     if not data.__contains__('edge_weight'):

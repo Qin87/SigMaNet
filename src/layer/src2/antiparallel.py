@@ -1,4 +1,5 @@
 import networkx as nx
+from scipy import sparse
 from scipy.sparse import coo_matrix
 import numpy as np
 
@@ -16,6 +17,8 @@ def biconnection(graph, dictionary):
 def biconnection_no_same_weights(graph, dictionary):
     row= [u  for u, v in graph.edges() if ((u != v) and (have_bidirectional_relationship(graph, u, v)) and (dictionary[u,v] != dictionary[v, u])) ]
     col = [v for u, v in graph.edges() if ((u != v) and (have_bidirectional_relationship(graph, u, v) and dictionary[u,v] != dictionary[v, u])) ]
+    # row = [u for u, v in graph.edges() if u != v and have_bidirectional_relationship(graph, u, v) and dictionary.get((u, v), None) != dictionary.get((v, u), None)]   # Qin
+    # col = [v for u, v in graph.edges() if u != v and have_bidirectional_relationship(graph, u, v) and dictionary.get((u, v), None) != dictionary.get((v, u), None)]   # Qin
     return row, col
 
 # Creation of a dictionary with initial node and weight indication
@@ -38,8 +41,12 @@ def antiparalell_different_weights(graph):
     '''
     Extraction of the antiparalell edges with different weights
     '''
-    graph_1 = nx.from_scipy_sparse_array(graph, create_using=nx.DiGraph)
+    # graph_1 = nx.from_scipy_sparse_array(graph, create_using=nx.DiGraph)
+    graph_1 = nx.from_scipy_sparse_matrix(graph, create_using=nx.DiGraph)       # Qin, revise the type above
+
     dictionary = dictionary_connection(graph_1)
     row, col = biconnection_no_same_weights(graph_1, dictionary)
+
+
     data =  [dictionary[u,v] for u, v in zip(row, col)]
     return coo_matrix((data, (row, col)), shape=(graph_1.number_of_nodes(), graph_1.number_of_nodes()), dtype=np.int8)

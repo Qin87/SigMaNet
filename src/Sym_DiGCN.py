@@ -14,7 +14,7 @@ import pickle as pk
 # internal files
 from layer.DGCN import SymModel
 from utils.edge_data import in_out_degree
-from utils.Citation import *
+# from utils.Citation import *
 from layer.geometric_baselines import *
 from utils.preprocess import F_in_out
 from utils.save_settings import write_log
@@ -37,7 +37,7 @@ def parse_args():
     parser.add_argument('--p_q', type=float, default=0.95, help='direction strength, from 0.5 to 1.')
     parser.add_argument('--seed', type=int, default=0, help='random seed for training testing split/random graph generation')
 
-    parser.add_argument('--epochs', type=int, default=1500, help='training epochs')
+    parser.add_argument('--epochs', type=int, default=500, help='training epochs')
     
     parser.add_argument('--debug', '-D', action='store_true', help='debug mode')
     parser.add_argument('--new_setting', '-NS', action='store_true', help='whether not to load best settings')
@@ -48,7 +48,7 @@ def parse_args():
     parser.add_argument('--randomseed', type=int, default=0, help='if set random seed in training')
 
     
-    parser.add_argument('--num_filter', type=int, default=16, help='num of filters')
+    parser.add_argument('--num_filter', type=int, default=64, help='num of filters')
     return parser.parse_args()
 
 def acc(pred, label, mask):
@@ -68,29 +68,29 @@ def main(args):
 
 
     dataset_name = args.dataset.split('/')
-<<<<<<< HEAD
+# <<<<<<< HEAD
+#     if len(dataset_name) == 1:
+#         try:
+#             data = pk.load(open(f'./data/fake/{args.dataset}.pk','rb'))
+#         except:
+#             data = pk.load(open(f'./data/fake_for_quaternion_new/{args.dataset}.pk','rb'))
+# =======
+#     if dataset_name[0] != 'telegram':
+#         data = pk.load(open(f'../data/fake/{args.dataset}.pk','rb'))
+# >>>>>>> da0026d665c714ecd47a413ab639fd7aaab4fabe
+#         data = node_class_split(data, train_size_per_class=0.6, val_size_per_class=0.2)
+#     else:
+#         load_func, subset = args.dataset.split('/')[0], args.dataset.split('/')[1]
+#      #save_name = args.method_name + '_' + 'Layer' + str(args.layer) + '_' + 'lr' + str(args.lr) + 'num_filters' + str(int(args.num_filter))+ '_' + 'task' + str((args.task))
+# <<<<<<< HEAD
+#         data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])#.to(device)
+# =======
     if len(dataset_name) == 1:
-        try:
-            data = pk.load(open(f'./data/fake/{args.dataset}.pk','rb'))
-        except:
-            data = pk.load(open(f'./data/fake_for_quaternion_new/{args.dataset}.pk','rb'))
-=======
-    if dataset_name[0] != 'telegram':
-        data = pk.load(open(f'../data/fake/{args.dataset}.pk','rb'))
->>>>>>> da0026d665c714ecd47a413ab639fd7aaab4fabe
-        data = node_class_split(data, train_size_per_class=0.6, val_size_per_class=0.2)
+        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[0])
     else:
-        load_func, subset = args.dataset.split('/')[0], args.dataset.split('/')[1]
-     #save_name = args.method_name + '_' + 'Layer' + str(args.layer) + '_' + 'lr' + str(args.lr) + 'num_filters' + str(int(args.num_filter))+ '_' + 'task' + str((args.task))
-<<<<<<< HEAD
-        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])#.to(device)
-=======
-        if len(dataset_name) == 1:
-            data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[0])
-        else:
-            data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])
+        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])
     
->>>>>>> da0026d665c714ecd47a413ab639fd7aaab4fabe
+# >>>>>>> da0026d665c714ecd47a413ab639fd7aaab4fabe
     if os.path.isdir(log_path) == False:
         os.makedirs(log_path)
 

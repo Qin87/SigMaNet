@@ -37,7 +37,7 @@ def parse_args():
     
 
     parser.add_argument('--epochs', type=int, default=1500, help='training epochs')
-    parser.add_argument('--num_filter', type=int, default=4, help='num of filters')
+    parser.add_argument('--num_filter', type=int, default=64, help='num of filters')
     parser.add_argument('--dropout', type=float, default=0.5, help='dropout prob')
     parser.add_argument('-to_undirected', '-tud', action='store_true', help='if convert graph to undirecteds')
     parser.add_argument('--debug', '-D', action='store_true', help='debug mode')
@@ -75,28 +75,32 @@ def main(args):
     
     
     dataset_name = args.dataset.split('/')
-    if args.dataset in ['telegram']:
-        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[0]).to(device)
-        data = data.to(device)
-        subset = args.dataset
+    if len(dataset_name) == 1:
+        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[0])
     else:
-        #data = load_signed_real_data_no_negative(dataset=args.dataset).to(device)
-        #data, edge_neg, weight_neg = load_signed_real_data_also_negative(dataset=args.dataset)
-        if args.dataset in ['bitcoin_alpha', 'bitcoin_otc']:
-            data = load_signed_real_data_no_negative(dataset=args.dataset).to(device)
-        else:
-<<<<<<< HEAD
-            try:
-                data = pk.load(open(f'./data/fake/{args.dataset}.pk','rb'))
-            except:
-                data = pk.load(open(f'./data/fake_for_quaternion_new/{args.dataset}.pk','rb'))
-            data = data.to(device)
-=======
-            data = pk.load(open(f'../data/fake/{args.dataset}.pk','rb'))
-        #subset = args.dataset        
-        data = data.to(device)
->>>>>>> da0026d665c714ecd47a413ab639fd7aaab4fabe
-        subset = args.dataset
+        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])
+#     if args.dataset in ['telegram']:
+#         data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[0]).to(device)
+#         data = data.to(device)
+#         subset = args.dataset
+#     else:
+#         #data = load_signed_real_data_no_negative(dataset=args.dataset).to(device)
+#         #data, edge_neg, weight_neg = load_signed_real_data_also_negative(dataset=args.dataset)
+#         if args.dataset in ['bitcoin_alpha', 'bitcoin_otc']:
+#             data = load_signed_real_data_no_negative(dataset=args.dataset).to(device)
+#         else:
+# <<<<<<< HEAD
+#             try:
+#                 data = pk.load(open(f'./data/fake/{args.dataset}.pk','rb'))
+#             except:
+#                 data = pk.load(open(f'./data/fake_for_quaternion_new/{args.dataset}.pk','rb'))
+#             data = data.to(device)
+# =======
+#             data = pk.load(open(f'../data/fake/{args.dataset}.pk','rb'))
+#         #subset = args.dataset
+#         data = data.to(device)
+# >>>>>>> da0026d665c714ecd47a413ab639fd7aaab4fabe
+#         subset = args.dataset
     edge_index = data.edge_index
 
     # load dataset
@@ -111,7 +115,7 @@ def main(args):
     #if args.task == 2:
     #    datasets = generate_dataset_2class(edge_index, splits = 10, test_prob = args.drop_prob)
     #else:
-    save_file = args.data_path + args.dataset + '/' + subset
+    # save_file = args.data_path + args.dataset + '/' + subset
     #datasets = link_class_split(data, prob_val=args.split_prob[0], prob_test=args.split_prob[1], splits = 10, task = args.task, noisy = args.noisy)
     datasets = link_class_split_new(data, prob_val=args.split_prob[0], prob_test=args.split_prob[1], splits = 10, task = args.task)
 

@@ -53,8 +53,8 @@ parser.add_argument('--activation', type=str, default = 'relu')
 parser.add_argument('--tau', type=float, default =0.4)
 
 
-parser.add_argument('--num_filter', type=int, default=2, help='num of filters')
-parser.add_argument('--epochs', type=int, default=200)
+parser.add_argument('--num_filter', type=int, default=64, help='num of filters')
+parser.add_argument('--epochs', type=int, default=500)
 parser.add_argument('--lr', type=float, default=1e-3)
 parser.add_argument('--drop_feature_rate_1', type=float, default=0.3)
 parser.add_argument('--drop_feature_rate_2', type=float, default=0.4)
@@ -142,18 +142,15 @@ np.random.seed(0)
 date_time = datetime.now().strftime('%m-%d-%H:%M:%S')
 log_path = os.path.join(args.log_root, args.log_path, args.save_name, date_time)
 
-if os.path.isdir(log_path) == False:
+if os.path.isdir(log_path) is False:
     os.makedirs(log_path)
 dataset_name = args.dataset.split('/')
-if dataset_name[0] != 'telegram':
-    try:
-        data = pk.load(open(f'./data/fake/{args.dataset}.pk','rb'))
-    except FileNotFoundError:
-        data = pk.load(open(f'./data/fake_for_quaternion_new/{args.dataset}.pk','rb'))
-    data = node_class_split(data, train_size_per_class=0.6, val_size_per_class=0.2)
+
+if len(dataset_name) == 1:
+    data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[0])
 else:
-    data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[0])#.to(device)
-    subset = args.dataset
+    data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])
+dataset = data
 
 size = data.y.size(-1)
 data.y = data.y.long()

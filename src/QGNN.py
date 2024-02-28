@@ -1,11 +1,17 @@
 # external files
 import numpy as np
 import pickle as pk
+
+# import scipy as sp
+import scipy.sparse as sp
 import torch.optim as optim
 from datetime import datetime
 import os, time, argparse
 import torch.nn.functional as F
 import random
+
+from scipy.sparse import coo_matrix
+from torch_geometric.utils import remove_self_loops
 from torch_geometric_signed_directed.data import load_directed_real_data
 from torch_geometric_signed_directed import node_class_split
 import networkx as nx
@@ -15,7 +21,7 @@ from torch_geometric.utils.num_nodes import maybe_num_nodes
 
 # internal files
 from layer.cheb import *
-from utils.Citation import *
+# from utils.Citation import *
 from layer.quaternion_baseline import QGNN_node
 from utils.edge_data import to_undirected
 from utils.save_settings import write_log
@@ -87,7 +93,8 @@ def normalize_adj(edge_index, edge_weight, x_real):
     row, col = edge_index.cpu()
     size = num_nodes
 
-    adj = sp.coo_matrix((edge_weight.cpu(), (row, col)), shape=(size, size), dtype=np.float32) + sp.eye(size)
+    # adj = sp.coo_matrix((edge_weight.cpu(), (row, col)), shape=(size, size), dtype=np.float32) + sp.eye(size)
+    adj = coo_matrix((edge_weight.cpu(), (row, col)), shape=(size, size), dtype=np.float32) + np.eye(size)       # Qin
     rowsum = np.array(adj.sum(1))
     d_inv_sqrt = np.power(rowsum, -0.5).flatten()
     d_inv_sqrt[np.isinf(d_inv_sqrt)] = 0.
@@ -106,15 +113,19 @@ def main(args):
 
     dataset_name = args.dataset.split('/')
     if len(dataset_name) == 1:
-        try:
-            data = pk.load(open(f'./data/fake/{args.dataset}.pk','rb'))
-        except:
-            data = pk.load(open(f'./data/fake_for_quaternion_new/{args.dataset}.pk','rb'))
-        data = node_class_split(data, train_size_per_class=0.6, val_size_per_class=0.2)
+        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[0])
     else:
-        load_func, subset = args.dataset.split('/')[0], args.dataset.split('/')[1]
-     #save_name = args.method_name + '_' + 'Layer' + str(args.layer) + '_' + 'lr' + str(args.lr) + 'num_filters' + str(int(args.num_filter))+ '_' + 'task' + str((args.task))
-        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])#.to(device)
+        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])
+    # if len(dataset_name) == 1:
+    #     try:
+    #         data = pk.load(open(f'./data/fake/{args.dataset}.pk','rb'))
+    #     except:
+    #         data = pk.load(open(f'./data/fake_for_quaternion_new/{args.dataset}.pk','rb'))
+    #     data = node_class_split(data, train_size_per_class=0.6, val_size_per_class=0.2)
+    # else:
+    #     load_func, subset = args.dataset.split('/')[0], args.dataset.split('/')[1]
+    #  #save_name = args.method_name + '_' + 'Layer' + str(args.layer) + '_' + 'lr' + str(args.lr) + 'num_filters' + str(int(args.num_filter))+ '_' + 'task' + str((args.task))
+    #     data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])#.to(device)
 
     if os.path.isdir(log_path) == False:
         os.makedirs(log_path)
@@ -137,6 +148,11 @@ def main(args):
 
     features = quaternion_preprocess_features(data.x).to(device)
     adj = sparse_mx_to_torch_sparse_tensor(normalize_adj(data.edge_index, data.edge_weight, data.x).tocoo()).to(device)
+    # adj = normalize_adj(data.edge_index, data.edge_weight, data.x)     # Qin
+    # # adj = sparse_mx_to_torch_sparse_tensor(adj).tocoo().to(device)
+    # adj_sparse = sp.csr_matrix(adj)  # Convert adj to a sparse CSR matrix
+    # adj = adj_sparse.tocoo()  # Convert to COO format
+
     data = data.to(device)
 
     if len(data.test_mask.shape) == 1:

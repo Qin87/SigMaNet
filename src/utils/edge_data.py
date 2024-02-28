@@ -27,7 +27,7 @@ import pandas as pd
 
 from typing import Optional, Callable, Union, List
 
-from torch_geometric_signed_directed.data import SignedDirectedGraphDataset
+# from torch_geometric_signed_directed.data import SignedDirectedGraphDataset
 #from .SignedDirectedGraphDatasetModified import SignedDirectedGraphDataset
 from torch_geometric_signed_directed.data import SSSNET_real_data
 from torch_geometric_signed_directed.data import SignedData

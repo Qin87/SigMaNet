@@ -12,7 +12,7 @@ import networkx as nx
 import pickle as pk
 
 # internal files
-from utils.Citation import *
+# from utils.Citation import *
 from utils.hermitian import *
 from layer.sparse_magnet import *
 from utils.save_settings import write_log
@@ -32,9 +32,9 @@ def parse_args():
     parser.add_argument('--log_root', type=str, default='../logs/', help='the path saving model.t7 and the training process')
     parser.add_argument('--log_path', type=str, default='test', help='the path saving model.t7 and the training process, the name of folder will be log/(current time)')
     parser.add_argument('--data_path', type=str, default='../dataset/data/tmp/', help='data set folder, for default format see dataset/cora/cora.edges and cora.node_labels')
-    parser.add_argument('--dataset', type=str, default='migration/migration', help='data set selection')
+    parser.add_argument('--dataset', type=str, default='WebKB/Cornell', help='data set selection')
 
-    parser.add_argument('--epochs', type=int, default=1, help='Number of (maximal) training epochs.')
+    parser.add_argument('--epochs', type=int, default=500, help='Number of (maximal) training epochs.')
     parser.add_argument('--q', type=float, default=0, help='q value for the phase matrix')
     parser.add_argument('--p_q', type=float, default=0.95, help='Direction strength, from 0.5 to 1.')
     parser.add_argument('--p_inter', type=float, default=0.1, help='Inter-cluster edge probabilities.')
@@ -53,7 +53,7 @@ def parse_args():
     parser.add_argument('--l2', type=float, default=5e-4, help='l2 regularizer')
 
     parser.add_argument('-activation', '-a', action='store_true', help='if use activation function')
-    parser.add_argument('--num_filter', type=int, default=1, help='num of filters')
+    parser.add_argument('--num_filter', type=int, default=64, help='num of filters')
     parser.add_argument('--randomseed', type=int, default=0, help='if set random seed in training')
     return parser.parse_args()
 
@@ -84,24 +84,24 @@ def main(args):
 
 
     dataset_name = args.dataset.split('/')
-<<<<<<< HEAD
+# <<<<<<< HEAD
+#     if len(dataset_name) == 1:
+#         try:
+#             data = pk.load(open(f'./data/fake/{args.dataset}.pk','rb'))
+#         except:
+#             data = pk.load(open(f'./data/fake_for_quaternion_new/{args.dataset}.pk','rb'))
+# =======
+#     if dataset_name[0] != 'telegram':
+#         data = pk.load(open(f'../data/fake/{args.dataset}.pk','rb'))
+# >>>>>>> da0026d665c714ecd47a413ab639fd7aaab4fabe
+#         data = node_class_split(data, train_size_per_class=0.6, val_size_per_class=0.2)
+#     else:
+#         load_func, subset = args.dataset.split('/')[0], args.dataset.split('/')[1]
+#      #save_name = args.method_name + '_' + 'Layer' + str(args.layer) + '_' + 'lr' + str(args.lr) + 'num_filters' + str(int(args.num_filter))+ '_' + 'task' + str((args.task))
     if len(dataset_name) == 1:
-        try:
-            data = pk.load(open(f'./data/fake/{args.dataset}.pk','rb'))
-        except:
-            data = pk.load(open(f'./data/fake_for_quaternion_new/{args.dataset}.pk','rb'))
-=======
-    if dataset_name[0] != 'telegram':
-        data = pk.load(open(f'../data/fake/{args.dataset}.pk','rb'))
->>>>>>> da0026d665c714ecd47a413ab639fd7aaab4fabe
-        data = node_class_split(data, train_size_per_class=0.6, val_size_per_class=0.2)
+        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[0])
     else:
-        load_func, subset = args.dataset.split('/')[0], args.dataset.split('/')[1]
-     #save_name = args.method_name + '_' + 'Layer' + str(args.layer) + '_' + 'lr' + str(args.lr) + 'num_filters' + str(int(args.num_filter))+ '_' + 'task' + str((args.task))
-        if len(dataset_name) == 1:
-            data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[0])
-        else:
-            data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])
+        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])
     dataset = data
     size = dataset.y.size(-1)
     f_node, e_node = dataset.edge_index[0], dataset.edge_index[1]

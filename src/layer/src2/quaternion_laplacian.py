@@ -199,8 +199,6 @@ def __norm_quaternion_(
         return edge_index, edge_weight_real, edge_weight_imag_i, edge_weight_imag_j, edge_weight_imag_k
         
 
-
-
 def process_quaternion_laplacian(edge_index: torch.LongTensor, x_real: Optional[torch.Tensor] = None, edge_weight: Optional[torch.Tensor] = None,
                   normalization: Optional[str] = 'sym',
                   num_nodes: Optional[int] = None,

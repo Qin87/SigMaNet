@@ -14,7 +14,7 @@ import pickle as pk
 
 # internal files
 from layer.cheb import *
-from utils.Citation import *
+# from utils.Citation import *      # Qin Can't find
 from layer.geometric_baselines import GATModel
 from torch_geometric.utils import to_undirected
 from utils.edge_data import in_out_degree
@@ -39,8 +39,8 @@ def parse_args():
     parser.add_argument('--method_name', type=str, default='GAT', help='method name')
     parser.add_argument('--seed', type=int, default=0, help='random seed for training testing split/random graph generation')
 
-    parser.add_argument('--epochs', type=int, default=1500, help='training epochs')
-    parser.add_argument('--num_filter', type=int, default=2, help='num of filters')
+    parser.add_argument('--epochs', type=int, default=500, help='training epochs')
+    parser.add_argument('--num_filter', type=int, default=64, help='num of filters')
     parser.add_argument('--dropout', type=float, default=0.0, help='dropout prob')
 
     parser.add_argument('--debug', '-D', action='store_true', help='debug mode')
@@ -70,28 +70,10 @@ def main(args):
     log_path = os.path.join(args.log_root, args.log_path, args.save_name, date_time)
 
     dataset_name = args.dataset.split('/')
-<<<<<<< HEAD
     if len(dataset_name) == 1:
-        try:
-            data = pk.load(open(f'./data/fake/{args.dataset}.pk','rb'))
-        except:
-            data = pk.load(open(f'./data/fake_for_quaternion_new/{args.dataset}.pk','rb'))
-=======
-    if dataset_name[0] != 'telegram':
-        data = pk.load(open(f'../data/fake/{args.dataset}.pk','rb'))
->>>>>>> da0026d665c714ecd47a413ab639fd7aaab4fabe
-        data = node_class_split(data, train_size_per_class=0.6, val_size_per_class=0.2)
+        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[0])
     else:
-        load_func, subset = args.dataset.split('/')[0], args.dataset.split('/')[1]
-     #save_name = args.method_name + '_' + 'Layer' + str(args.layer) + '_' + 'lr' + str(args.lr) + 'num_filters' + str(int(args.num_filter))+ '_' + 'task' + str((args.task))
-        if len(dataset_name) == 1:
-            data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[0])
-        else:
-            data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])
-
-
-
-
+        data = load_directed_real_data(dataset=dataset_name[0], name=dataset_name[1])
 
     if os.path.isdir(log_path) == False:
         os.makedirs(log_path)
